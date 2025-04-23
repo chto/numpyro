@@ -249,7 +249,7 @@ def _value_and_grad(f, x, forward_mode_differentiation=False):
         grads, out = jacfwd(_wrapper, has_aux=True)(x)
         return out, grads
     else:
-        return value_and_grad(f, has_aux=False)(x)
+        return jax.jit(value_and_grad(f, has_aux=False))(x)
 
 
 def _kinetic_grad(kinetic_fn, inverse_mass_matrix, r):
@@ -347,7 +347,7 @@ def find_reasonable_step_size(
     _, vv_update = velocity_verlet(potential_fn, kinetic_fn)
     z, _, potential_energy, z_grad = z_info
     if potential_energy is None or z_grad is None:
-        potential_energy, z_grad = value_and_grad(potential_fn)(z)
+        potential_energy, z_grad = jax.jit(value_and_grad(potential_fn))(z)
     finfo = jnp.finfo(jnp.result_type(init_step_size))
 
     def _body_fn(state):

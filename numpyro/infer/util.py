@@ -439,7 +439,7 @@ def find_valid_initial_params(
                 pe = potential_fn(params)
                 z_grad = jacfwd(potential_fn)(params)
             else:
-                pe, z_grad = value_and_grad(potential_fn)(params)
+                pe, z_grad = jax.jit(value_and_grad(potential_fn))(params)
             z_grad_flat = ravel_pytree(z_grad)[0]
             is_valid = jnp.isfinite(pe) & jnp.all(jnp.isfinite(z_grad_flat))
         else:
